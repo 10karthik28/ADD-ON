@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reviews</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f3f1eb;
+            color: #424d32;
+            min-height: 100vh;
+        }
+
+        /* Main container */
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: auto;
+            padding: 35px 0 60px;
+        }
+
+        /* Small heading */
+
+        .brand {
+            font-family: Georgia, serif;
+            font-size: 20px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        /* Main heading */
+
+        .heading {
+            font-family: Georgia, "Times New Roman", serif;
+            font-style: italic;
+            font-size: clamp(80px, 12vw, 180px);
+            font-weight: normal;
+            line-height: 0.8;
+            color: #4d5b3b;
+            margin-bottom: 70px;
+        }
+
+        /* Content */
+
+        .content {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 50px;
+            align-items: start;
+        }
+
+        /* Write review section */
+
+        .write-review {
+            background: #e7e3d8;
+            border-radius: 28px;
+            padding: 40px;
+            position: sticky;
+            top: 30px;
+        }
+
+        .write-review h2 {
+            font-family: Georgia, serif;
+            font-size: 40px;
+            font-weight: normal;
+            color: #4d5b3b;
+            margin-bottom: 10px;
+        }
+
+        .write-review p {
+            color: #6d7064;
+            margin-bottom: 30px;
+        }
+
+        /* Form */
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4d5b3b;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid #c8c6bc;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 15px;
+            outline: none;
+            background: #faf9f5;
+            color: #424d32;
+            margin-bottom: 20px;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #596747;
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        /* Stars */
+
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+        }
+
+        .star {
+            font-size: 30px;
+            color: #c8c5b8;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .star:hover {
+            transform: scale(1.1);
+        }
+
+        .star.active {
+            color: #e0ad14;
+        }
+
+        /* Submit button */
+
+        .submit-btn {
+            width: 100%;
+            border: none;
+            background: #4d5b3b;
+            color: white;
+            padding: 16px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #39452c;
+            transform: translateY(-2px);
+        }
+
+        /* Reviews section */
+
+        .reviews-section {
+            max-height: 720px;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .reviews-section::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .reviews-section::-webkit-scrollbar-thumb {
+            background: #b7b7a9;
+            border-radius: 10px;
+        }
+
+        /* Review card */
+
+        .review-card {
+            background: white;
+            border-radius: 25px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .review-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reviewer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Profile circle */
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #4d5b3b;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .reviewer-info h3 {
+            font-size: 16px;
+            color: #252a21;
+            margin-bottom: 3px;
+        }
+
+        .reviewer-info span {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* More icon */
+
+        .more {
+            font-size: 22px;
+            color: #777;
+        }
+
+        /* Rating */
+
+        .rating {
+            margin-top: 18px;
+            margin-bottom: 12px;
+            color: #e1af13;
+            font-size: 18px;
+        }
+
+        /* Review text */
+
+        .review-text {
+            color: #40433d;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Message */
+
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #4d5b3b;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 900px) {
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .write-review {
+                position: relative;
+                top: 0;
+            }
+
+            .reviews-section {
+                max-height: none;
+                overflow: visible;
+            }
+
+            .heading {
+                font-size: 90px;
+                margin-bottom: 50px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .container {
+                width: 92%;
+            }
+
+            .heading {
+                font-size: 65px;
+            }
+
+            .write-review {
+                padding: 25px;
+            }
+
+            .review-card {
+                padding: 20px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="brand">
+        QUICK BITE
+    </div>
+
+    <h1 class="heading">
+        reviews
+    </h1>
+
+
+    <div class="content">
+
+        <div class="write-review">
+
+            <h2>Write a review</h2>
+
+            <p>
+                We would love to know what you think.
+                Share your experience with us.
+            </p>
+
+            <form id="reviewForm">
+
+                <label for="name">
+                    Your name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your name"
+                    required
+                >
+
+
+                <label>
+                    Your rating
+                </label>
+
+                <div class="stars">
+
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+
+                </div>
+
+
+                <label for="review">
+                    Your review
+                </label>
+
+                <textarea
+                    id="review"
+                    placeholder="Write your review here..."
+                    required
+                ></textarea>
+
+
+                <button
+                    type="submit"
+                    class="submit-btn"
+                >
+                    Submit Review
+                </button>
+
+                <p id="message"></p>
+
+            </form>
+
+        </div>
+
+
+        <div class="reviews-section" id="reviews">
+
+            <div class="review-card">
+
+                <div class="review-top">
+
+                    <div class="reviewer">
+
+                        <div class="avatar">
+                            N
+                        </div>
+
+                        <div class="reviewer-info">
+
+                            <h3>Nancy Bandy</h3>
+
+                            <span>
+                                10 reviews
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="rating">
+                    ★★★★★
+                </div>
+
+                <p class="review-text">
+                    Fantastic! You will LOVE it on just about
+                    everything! 👍🏻👍🏻👍🏻
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    let selectedRating = 0;
+
+    const stars = document.querySelectorAll(".star");
+
+    /* Star selection */
+
+    stars.forEach(star => {
+
+        star.addEventListener("click", function () {
+
+            selectedRating = this.dataset.value;
+
+            stars.forEach(s => {
+
+                if (s.dataset.value <= selectedRating) {
+                    s.classList.add("active");
+                }
+                else {
+                    s.classList.remove("active");
+                }
+
+            });
+
+        });
+
+    });
+
+
+    /* Form submission */
+
+    document
+        .getElementById("reviewForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const name =
+                document.getElementById("name").value.trim();
+
+            const review =
+                document.getElementById("review").value.trim();
+
+            const message =
+                document.getElementById("message");
+
+
+            /* Check rating */
+
+            if (selectedRating === 0) {
+
+                message.textContent =
+                    "Please select a rating.";
+
+                return;
+            }
+
+
+            /* Create stars */
+
+            let starsHTML = "";
+
+            for (let i = 1; i <= 5; i++) {
+
+                if (i <= selectedRating) {
+                    starsHTML += "★";
+                }
+                else {
+                    starsHTML += "☆";
+                }
+
+            }
+
+
+            /* Create avatar */
+
+            const firstLetter =
+                name.charAt(0).toUpperCase();
+
+
+            /* Create review card */
+
+            const reviewCard =
+                document.createElement("div");
+
+            reviewCard.className = "review-card";
+
+            reviewCard.innerHTML = `
+
+                <div class="review-top">
+
+                    <div class="reviewer">
+
+                        <div class="avatar">
+                            ${firstLetter}
+                        </div>
+
+                        <div class="reviewer-info">
+
+                            <h3>
+                                ${name}
+                            </h3>
+
+                            <span>
+                                Just now
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="more">
+                        ⋮
+                    </div>
+
+                </div>
+
+                <div class="rating">
+                    ${starsHTML}
+                </div>
+
+                <p class="review-text">
+                    ${review}
+                </p>
+
+            `;
+
+
+            /* Add review at the top */
+
+            document
+                .getElementById("reviews")
+                .prepend(reviewCard);
+
+
+            /* Success message */
+
+            message.textContent =
+                "Thank you for your review!";
+
+
+            /* Reset form */
+
+            document.getElementById("reviewForm").reset();
+
+            selectedRating = 0;
+
+            stars.forEach(star => {
+                star.classList.remove("active");
+            });
+
+        });
+
+</script>
+
+</body>
+</html>
