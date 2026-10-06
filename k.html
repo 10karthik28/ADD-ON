@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBites - Smart Food Delivery & Live Price Guarantee</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Configuration for Custom Ochre & Cream Theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: {
+                            base: '#FAF6EE',
+                            surface: '#FFFDF8',
+                            dark: '#F3ECE0',
+                            border: '#E8DCCB'
+                        },
+                        ochre: {
+                            primary: '#C98A2C',
+                            dark: '#9E6B1F',
+                            light: '#F7E7C4',
+                            accent: '#E2B04E'
+                        },
+                        earth: {
+                            charcoal: '#2D2319',
+                            muted: '#7C6E62'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 30px -5px rgba(45, 35, 25, 0.05)',
+                        'ochre-glow': '0 8px 25px -4px rgba(201, 138, 44, 0.25)',
+                        'card-hover': '0 15px 35px -5px rgba(201, 138, 44, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FAF6EE;
+            color: #2D2319;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F3ECE0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E2B04E;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C98A2C;
+        }
+
+        /* Live Pulse Dot Animation */
+        @keyframes livePulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(201, 138, 44, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 8px rgba(201, 138, 44, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(201, 138, 44, 0);
+            }
+        }
+
+        .pulse-indicator {
+            animation: livePulse 2s infinite;
+        }
+
+        /* Shimmer Effect for Best Value Badge */
+        @keyframes badgeShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .shimmer-badge {
+            background: linear-gradient(90deg, #C98A2C 0%, #E2B04E 50%, #C98A2C 100%);
+            background-size: 200% 100%;
+            animation: badgeShimmer 3s infinite linear;
+        }
+
+        /* Smooth Slide-in Drawer */
+        .drawer-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .drawer-content {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Accordion transition */
+        .accordion-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- APP HEADER -->
+    <header class="sticky top-0 z-40 bg-cream-surface/90 backdrop-blur-md border-b border-cream-border transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <a href="#" class="flex items-center gap-2.5 group">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-ochre-primary to-ochre-accent flex items-center justify-center text-white shadow-ochre-glow group-hover:scale-105 transition-transform">
+                        <i class="fa-solid font-bold fa-utensils text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold tracking-tight text-earth-charcoal flex items-center gap-1">
+                            Quick<span class="text-ochre-primary">Bites</span>
+                        </span>
+                        <span class="block text-[10px] font-bold tracking-widest uppercase text-earth-muted -mt-1">Best Price Guarantee</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Global Search & Location Bar -->
+            <div class="hidden md:flex items-center flex-1 max-w-md mx-6">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-earth-muted text-sm"></i>
+                    <input type="text" id="globalSearchInput" onkeyup="filterRestaurants()" placeholder="Search cuisines, dishes, or open spots..." 
+                        class="w-full pl-11 pr-4 py-2.5 rounded-full bg-cream-base border border-cream-border text-earth-charcoal placeholder-earth-muted/70 text-sm focus:outline-none focus:border-ochre-primary focus:ring-2 focus:ring-ochre-light transition-all">
+                </div>
+            </div>
+
+            <!-- User Rewards Summary & Cart Button -->
+            <div class="flex items-center gap-3">
+                
+                <!-- Rewards Tier Badge -->
+                <button onclick="scrollToSection('rewards-hub')" class="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-ochre-light/50 border border-ochre-accent/30 hover:bg-ochre-light transition-all">
+                    <div class="w-6 h-6 rounded-full bg-ochre-primary text-white flex items-center justify-center text-xs font-bold">
+                        <i class="fa-solid fa-crown text-[10px]"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-xs font-bold text-earth-charcoal flex items-center gap-1">
+                            Silver Bite <span class="text-[10px] text-ochre-dark font-extrabold">850 pts</span>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Interactive Cart Trigger -->
+                <button onclick="toggleCartDrawer(true)" class="relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-ochre-primary hover:bg-ochre-dark text-white font-semibold text-sm shadow-ochre-glow hover:shadow-lg transition-all active:scale-95">
+                    <i class="fa-solid fa-bag-shopping text-base"></i>
+                    <span class="hidden xs:inline">Basket</span>
+                    <span id="headerCartCount" class="w-5 h-5 rounded-full bg-white text-ochre-dark text-xs font-extrabold flex items-center justify-center">0</span>
+                    <span id="headerCartTotal" class="text-xs font-bold pl-1 border-l border-white/30">$0.00</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="px-4 pb-3 md:hidden">
+            <div class="relative w-full">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-earth-muted text-sm"></i>
+                <input type="text" id="mobileSearchInput" onkeyup="syncMobileSearch(this.value)" placeholder="Search restaurants or dishes..." 
+                    class="w-full pl-11 pr-4 py-2 rounded-full bg-cream-base border border-cream-border text-earth-charcoal placeholder-earth-muted/70 text-sm focus:outline-none focus:border-ochre-primary">
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT BODY -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10 flex-1 w-full">
+
+        <!-- HERO VALUE PROPOSITION BANNER -->
+        <section class="relative rounded-3xl bg-gradient-to-r from-ochre-primary via-ochre-accent to-ochre-dark text-white overflow-hidden p-6 sm:p-10 shadow-soft">
+            <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-2xl">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold tracking-wide uppercase text-white mb-3 border border-white/30">
+                    <i class="fa-solid fa-bolt text-yellow-300"></i> Smart Delivery Engine
+                </span>
+                <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                    Order From Open Spots. <br class="hidden sm:inline"/>Never Pay Platform Markup.
+                </h1>
+                <p class="mt-2 sm:mt-3 text-white/90 text-sm sm:text-base leading-relaxed">
+                    QuickBites checks live restaurant availability, eliminates hidden surge fees, and guarantees up to 25% cheaper orders than UberEats or DoorDash.
+                </p>
+                
+                <div class="mt-6 flex flex-wrap gap-4 text-xs sm:text-sm font-semibold">
+                    <div class="flex items-center gap-2 bg-white/15 px-3.5 py-2 rounded-xl backdrop-blur-md border border-white/20">
+                        <i class="fa-solid fa-circle-check text-yellow-300"></i> Zero Surge Pricing
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/15 px-3.5 py-2 rounded-xl backdrop-blur-md border border-white/20">
+                        <i class="fa-solid fa-clock text-yellow-300"></i> Live Open Filter
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/15 px-3.5 py-2 rounded-xl backdrop-blur-md border border-white/20">
+                        <i class="fa-solid fa-coins text-yellow-300"></i> Instant Voucher Stacking
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPONENT 3: OFFERS, DISCOUNTS & REWARDS HUB -->
+        <section id="rewards-hub" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-cream-border pb-4">
+                <div>
+                    <div class="flex items-center gap-2 text-ochre-dark font-bold text-xs uppercase tracking-wider">
+                        <i class="fa-solid fa-gift"></i> Rewards & Loyalty Program
+                    </div>
+                    <h2 class="text-2xl font-bold text-earth-charcoal mt-1">Offers, Vouchers & Gold Tier Rewards</h2>
+                </div>
+                <p class="text-sm text-earth-muted">Earn 10 points for every $1 spent. Redeem for free items or total cart discounts.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Rewards Progress Card -->
+                <div class="bg-cream-surface rounded-2xl p-6 border border-cream-border shadow-soft flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-ochre-dark bg-ochre-light/60 px-2.5 py-1 rounded-md">Current Level</span>
+                            <h3 class="text-xl font-extrabold text-earth-charcoal mt-1 flex items-center gap-2">
+                                Silver Bite Member <i class="fa-solid fa-medal text-ochre-accent"></i>
+                            </h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-ochre-light text-ochre-dark flex items-center justify-center font-black text-lg">
+                            85%
+                        </div>
+                    </div>
+
+                    <div class="my-5 space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-earth-charcoal">
+                            <span>850 / 1,000 pts</span>
+                            <span class="text-ochre-dark">150 pts to "Gold Bite" Tier</span>
+                        </div>
+                        <!-- Tier Progress Bar -->
+                        <div class="w-full bg-cream-dark h-3 rounded-full overflow-hidden p-0.5 border border-cream-border">
+                            <div class="bg-gradient-to-r from-ochre-primary to-ochre-accent h-full rounded-full transition-all duration-1000" style="width: 85%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-cream-base rounded-xl p-3 border border-cream-border flex items-center justify-between text-xs text-earth-muted">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-sparkles text-ochre-primary"></i> Next Reward: $10 Off Order
+                        </span>
+                        <button onclick="openRewardsModal()" class="text-ochre-dark font-bold hover:underline">Claim Options</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Scrollable Voucher Chips & Stacker -->
+                <div class="lg:col-span-2 bg-cream-surface rounded-2xl p-6 border border-cream-border shadow-soft flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-earth-charcoal">Active Dynamic Vouchers</h3>
+                            <p class="text-xs text-earth-muted">Click a voucher chip to apply directly to your cart and live comparison</p>
+                        </div>
+
+                        <!-- Manual Promo Code Input -->
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="promoInput" placeholder="Enter PROMO Code" class="px-3 py-1.5 text-xs rounded-lg bg-cream-base border border-cream-border text-earth-charcoal uppercase font-bold focus:outline-none focus:border-ochre-primary">
+                            <button onclick="applyManualPromo()" class="px-3 py-1.5 text-xs font-bold bg-earth-charcoal text-white rounded-lg hover:bg-black transition-colors">Apply</button>
+                        </div>
+                    </div>
+
+                    <!-- Voucher Chips Carousel -->
+                    <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none" id="voucherContainer">
+                        <!-- Vouchers rendered via JS -->
+                    </div>
+
+                    <!-- Applied Voucher Banner -->
+                    <div id="activeVoucherBar" class="mt-4 p-3 rounded-xl bg-ochre-light/40 border border-ochre-accent/40 flex items-center justify-between text-xs font-semibold text-earth-charcoal">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-ochre-primary text-sm"></i>
+                            <span id="activeVoucherText">No voucher applied. Click any chip above to save extra!</span>
+                        </div>
+                        <button id="removeVoucherBtn" onclick="removeVoucher()" class="hidden text-red-600 font-bold hover:underline text-[11px]">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPONENT 1: "ONLY CURRENTLY AVAILABLE RESTAURANTS" LIVE CATALOG -->
+        <section id="catalog-section" class="space-y-6 pt-4">
+            
+            <!-- Section Header with Live Availability Master Toggle -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-cream-surface p-5 rounded-2xl border border-cream-border shadow-soft">
+                <div>
+                    <div class="flex items-center gap-2 text-ochre-dark font-bold text-xs uppercase tracking-wider">
+                        <i class="fa-solid fa-store"></i> Live Local Vendors
+                    </div>
+                    <h2 class="text-2xl font-bold text-earth-charcoal mt-0.5">Explore Nearby Restaurants</h2>
+                </div>
+
+                <!-- Master "Show Open Now Only" Toggle Switch -->
+                <div class="flex items-center gap-3 bg-cream-base p-2 rounded-xl border border-cream-border self-start md:self-auto">
+                    <div class="flex items-center gap-2 px-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-indicator"></span>
+                        <span class="text-xs font-bold text-earth-charcoal">Open Restaurants Only</span>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="openOnlyToggle" onchange="toggleOpenFilter(this.checked)" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-cream-dark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ochre-primary"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Cuisine Quick Filters -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="cuisineFilterContainer">
+                <!-- Filter Pills rendered via JS -->
+            </div>
+
+            <!-- Restaurant Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="restaurantGrid">
+                <!-- Restaurant Cards dynamically injected -->
+            </div>
+        </section>
+
+        <!-- COMPONENT 2: INTERACTIVE PRICE COMPARISON MODULE -->
+        <section id="price-comparison" class="space-y-6 pt-4">
+            <div class="bg-cream-surface rounded-3xl border border-cream-border p-6 sm:p-8 shadow-soft space-y-6">
+                
+                <!-- Module Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cream-border pb-5">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ochre-light text-ochre-dark text-xs font-extrabold uppercase tracking-wider mb-2">
+                            <i class="fa-solid fa-scale-balanced"></i> Real-Time Price Index
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-earth-charcoal">Platform Price Comparison Engine</h2>
+                        <p class="text-earth-muted text-sm mt-1">Adjust menu basket items below to see live transparent fee structures across delivery services.</p>
+                    </div>
+
+                    <!-- Quick Best Value Summary Tag -->
+                    <div id="overallSavingsBanner" class="bg-ochre-light/50 border border-ochre-accent/40 rounded-2xl p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-ochre-primary text-white flex items-center justify-center text-lg font-bold shadow-ochre-glow">
+                            <i class="fa-solid fa-piggy-bank"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold uppercase text-ochre-dark tracking-wide">QuickBites Advantage</div>
+                            <div class="text-base font-extrabold text-earth-charcoal" id="savingsAmountText">Save up to $8.25 on this basket</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Basket Item Selector for Comparison Engine -->
+                <div class="bg-cream-base rounded-2xl p-4 border border-cream-border">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-earth-muted">Simulated Sample Cart Basket</h4>
+                        <button onclick="resetComparisonCart()" class="text-xs font-bold text-ochre-dark hover:underline">Reset Sample Items</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="sampleItemsContainer">
+                        <!-- Sample item adjusters inserted via JS -->
+                    </div>
+                </div>
+
+                <!-- Platform Comparison Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="platformComparisonGrid">
+                    <!-- Platform cards rendered dynamically -->
+                </div>
+
+                <!-- Expandable Accordion Itemized Line-Item Breakdown -->
+                <div class="border border-cream-border rounded-2xl overflow-hidden bg-cream-surface">
+                    <button onclick="toggleAccordion('itemizedBreakdown')" class="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-earth-charcoal bg-cream-base/50 hover:bg-cream-base transition-colors">
+                        <span class="flex items-center gap-2 text-sm sm:text-base">
+                            <i class="fa-solid fa-receipt text-ochre-primary"></i> Detailed Line-Item & Fee Transparency Breakdown
+                        </span>
+                        <i id="breakdownChevron" class="fa-solid fa-chevron-down text-earth-muted transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="itemizedBreakdown" class="hidden p-5 border-t border-cream-border overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-cream-border text-earth-muted font-bold">
+                                    <th class="py-2.5 px-3">Cost Component</th>
+                                    <th class="py-2.5 px-3 text-ochre-dark font-extrabold bg-ochre-light/20">QuickBites</th>
+                                    <th class="py-2.5 px-3">UberEats</th>
+                                    <th class="py-2.5 px-3">DoorDash</th>
+                                    <th class="py-2.5 px-3">Deliveroo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparisonTableBody" class="divide-y divide-cream-border/60 text-earth-charcoal font-medium">
+                                <!-- Dynamically generated breakdown rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER SECTION -->
+    <footer class="bg-cream-surface border-t border-cream-border py-10 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-ochre-primary text-white flex items-center justify-center font-bold text-sm">
+                    QB
+                </div>
+                <span class="font-bold text-earth-charcoal text-sm">QuickBites Technologies © 2026. All rights reserved.</span>
+            </div>
+            <div class="flex items-center gap-6 text-xs text-earth-muted font-semibold">
+                <a href="#" class="hover:text-ochre-dark">Price Guarantee Terms</a>
+                <a href="#" class="hover:text-ochre-dark">Merchant Portal</a>
+                <a href="#" class="hover:text-ochre-dark">Rewards Policy</a>
+                <a href="#" class="hover:text-ochre-dark">Support & Help</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE SLIDE-OVER CART DRAWER -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 pointer-events-none hidden">
+        <!-- Backdrop -->
+        <div id="cartBackdrop" onclick="toggleCartDrawer(false)" class="drawer-overlay absolute inset-0 bg-earth-charcoal/50 backdrop-blur-sm opacity-0 transition-opacity"></div>
+
+        <!-- Right Panel Container -->
+        <div id="cartPanel" class="drawer-content absolute right-0 top-0 bottom-0 w-full max-w-md bg-cream-surface shadow-2xl flex flex-col justify-between translate-x-full pointer-events-auto border-l border-cream-border">
+            
+            <!-- Drawer Header -->
+            <div class="p-5 border-b border-cream-border flex items-center justify-between bg-cream-base">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-ochre-primary text-lg"></i>
+                    <h3 class="font-extrabold text-earth-charcoal text-lg">Your QuickBites Order</h3>
+                </div>
+                <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-full bg-cream-dark text-earth-muted hover:text-earth-charcoal flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Drawer Cart Items list -->
+            <div class="p-5 flex-1 overflow-y-auto space-y-4" id="cartItemList">
+                <!-- Items rendered dynamically -->
+            </div>
+
+            <!-- Drawer Cart Summary & Checkout -->
+            <div class="p-5 border-t border-cream-border bg-cream-base/80 space-y-3">
+                
+                <!-- Savings Alert pill -->
+                <div class="bg-ochre-light/50 p-2.5 rounded-xl border border-ochre-accent/40 flex items-center justify-between text-xs font-bold text-earth-charcoal">
+                    <span class="flex items-center gap-1.5 text-ochre-dark">
+                        <i class="fa-solid fa-sparkles"></i> Competitor Price Savings:
+                    </span>
+                    <span id="drawerSavingsText" class="text-ochre-dark font-extrabold">$0.00</span>
+                </div>
+
+                <!-- Line Item Totals -->
+                <div class="space-y-1.5 text-xs text-earth-muted font-semibold">
+                    <div class="flex justify-between">
+                        <span>Items Subtotal</span>
+                        <span id="cartSubtotal" class="text-earth-charcoal font-bold">$0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Delivery Fee (QuickBites Flat)</span>
+                        <span id="cartDeliveryFee" class="text-earth-charcoal font-bold">$1.99</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Applied Discount</span>
+                        <span id="cartDiscount" class="text-emerald-600 font-bold">-$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-ochre-dark">
+                        <span>Points Earned on Checkout</span>
+                        <span id="cartPointsEarned" class="font-extrabold">+0 pts</span>
+                    </div>
+                </div>
+
+                <!-- Total -->
+                <div class="pt-2 border-t border-cream-border flex justify-between items-center text-earth-charcoal">
+                    <span class="font-extrabold text-base">Grand Total</span>
+                    <span id="cartGrandTotal" class="font-black text-xl text-ochre-dark">$0.00</span>
+                </div>
+
+                <!-- Checkout Button -->
+                <button onclick="executeCheckout()" class="w-full py-3.5 rounded-xl bg-ochre-primary hover:bg-ochre-dark text-white font-extrabold text-sm shadow-ochre-glow transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                    <span>Proceed to Checkout</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRE-ORDER / REMINDER MODAL FOR CLOSED RESTAURANTS -->
+    <div id="reminderModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-earth-charcoal/60 backdrop-blur-sm hidden">
+        <div class="bg-cream-surface rounded-3xl border border-cream-border p-6 max-w-sm w-full space-y-4 shadow-2xl relative">
+            <button onclick="closeReminderModal()" class="absolute right-4 top-4 text-earth-muted hover:text-earth-charcoal text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-12 h-12 rounded-2xl bg-ochre-light text-ochre-dark flex items-center justify-center text-2xl font-bold">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold text-earth-charcoal" id="modalRestName">Restaurant Offline</h3>
+                <p class="text-xs text-earth-muted mt-1" id="modalRestDetail">This location is currently closed. Set an opening notification or schedule a pre-order slot.</p>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <label class="block font-bold text-earth-charcoal">Select Action:</label>
+                <button onclick="confirmAction('Reminder set! We will notify you as soon as this kitchen opens.')" class="w-full py-2.5 rounded-xl bg-cream-dark text-earth-charcoal font-bold hover:bg-ochre-light transition-colors text-left px-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-bell text-ochre-primary mr-2"></i> Notify me when open</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+                <button onclick="confirmAction('Pre-order placed for opening hour delivery!')" class="w-full py-2.5 rounded-xl bg-ochre-primary text-white font-bold hover:bg-ochre-dark transition-colors text-left px-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-calendar-plus mr-2"></i> Schedule Pre-order</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REWARDS CLAIM MODAL -->
+    <div id="rewardsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-earth-charcoal/60 backdrop-blur-sm hidden">
+        <div class="bg-cream-surface rounded-3xl border border-cream-border p-6 max-w-md w-full space-y-5 shadow-2xl relative">
+            <button onclick="closeRewardsModal()" class="absolute right-4 top-4 text-earth-muted hover:text-earth-charcoal text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-ochre-primary text-white flex items-center justify-center font-bold text-lg">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-extrabold text-earth-charcoal">Silver Bite Perk Store</h3>
+                    <p class="text-xs text-earth-muted">Available Points: <span class="text-ochre-dark font-extrabold">850 pts</span></p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="p-3 bg-cream-base border border-cream-border rounded-xl flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-extrabold text-earth-charcoal">$5 Off Next Order</div>
+                        <div class="text-[11px] text-earth-muted">Cost: 500 Points</div>
+                    </div>
+                    <button onclick="claimPerk('$5 Off Voucher', 500)" class="px-3 py-1.5 rounded-lg bg-ochre-primary text-white font-bold text-xs hover:bg-ochre-dark">Claim</button>
+                </div>
+
+                <div class="p-3 bg-cream-base border border-cream-border rounded-xl flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-extrabold text-earth-charcoal">Free Artisanal Dessert</div>
+                        <div class="text-[11px] text-earth-muted">Cost: 750 Points</div>
+                    </div>
+                    <button onclick="claimPerk('Free Dessert Voucher', 750)" class="px-3 py-1.5 rounded-lg bg-ochre-primary text-white font-bold text-xs hover:bg-ochre-dark">Claim</button>
+                </div>
+
+                <div class="p-3 bg-cream-base border border-cream-border rounded-xl flex items-center justify-between opacity-60">
+                    <div>
+                        <div class="text-xs font-extrabold text-earth-charcoal">$10 Off Next Order</div>
+                        <div class="text-[11px] text-earth-muted">Cost: 1,000 Points (Gold Tier)</div>
+                    </div>
+                    <button disabled class="px-3 py-1.5 rounded-lg bg-cream-dark text-earth-muted font-bold text-xs cursor-not-allowed">Locked</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-earth-charcoal text-white px-5 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-3 border border-ochre-accent/30 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-info text-ochre-accent text-base"></i>
+        <span id="toastMsg">Action successfully performed!</span>
+    </div>
+
+    <script>
+        
+        // Mock Restaurant Data
+        const RESTAURANTS = [
+            {
+                id: 'r1',
+                name: 'The Golden Bun Burgers',
+                cuisine: 'Burger',
+                rating: 4.8,
+                reviews: 320,
+                dist: '1.2 miles',
+                isOpen: true,
+                prepTime: '15-20 min',
+                popularDish: 'Truffle Ochre Cheese Burger',
+                dishPrice: 12.99,
+                img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80',
+                offer: '15% OFF ORDERS OVER $20'
+            },
+            {
+                id: 'r2',
+                name: 'Artisan Crust & Oven',
+                cuisine: 'Pizza',
+                rating: 4.9,
+                reviews: 512,
+                dist: '2.4 miles',
+                isOpen: true,
+                prepTime: '20-30 min',
+                popularDish: 'Smoked Honey & Pepperoni Pizza',
+                dishPrice: 16.50,
+                img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+                offer: 'FREE DELIVERY'
+            },
+            {
+                id: 'r3',
+                name: 'Silk Road Ramen & Bowl',
+                cuisine: 'Asian',
+                rating: 4.7,
+                reviews: 189,
+                dist: '0.8 miles',
+                isOpen: true,
+                prepTime: '10-18 min',
+                popularDish: 'Tonkotsu Ochre Broth Ramen',
+                dishPrice: 14.25,
+                img: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+                offer: 'BOGO DRINK'
+            },
+            {
+                id: 'r4',
+                name: 'Verde Harvest Salads',
+                cuisine: 'Healthy',
+                rating: 4.6,
+                reviews: 140,
+                dist: '3.1 miles',
+                isOpen: false,
+                nextOpen: '7:00 PM',
+                popularDish: 'Warm Quinoa & Roasted Squash Bowl',
+                dishPrice: 11.50,
+                img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80',
+                offer: 'CLOSED • PRE-ORDER ONLY'
+            },
+            {
+                id: 'r5',
+                name: 'Trattoria Dolce Vita',
+                cuisine: 'Italian',
+                rating: 4.9,
+                reviews: 410,
+                dist: '1.9 miles',
+                isOpen: true,
+                prepTime: '25-35 min',
+                popularDish: 'Handmade Tagliatelle Carbonara',
+                dishPrice: 18.00,
+                img: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600&q=80',
+                offer: '$5 OFF CODE: QUICK5'
+            },
+            {
+                id: 'r6',
+                name: 'Crema & Sugar Bakery',
+                cuisine: 'Dessert',
+                rating: 4.8,
+                reviews: 230,
+                dist: '0.5 miles',
+                isOpen: false,
+                nextOpen: '8:00 AM Tomorrow',
+                popularDish: 'Golden Honey Glazed Tart',
+                dishPrice: 7.50,
+                img: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80',
+                offer: 'CLOSED • REMINDER AVAILABLE'
+            }
+        ];
+
+        // Voucher Options
+        const VOUCHERS = [
+            { code: 'QUICK20', discountPercent: 20, desc: '20% OFF Entire Cart', minSpend: 15 },
+            { code: 'FREEDEL', flatDiscount: 1.99, desc: 'Free Delivery ($1.99 Saved)', minSpend: 10 },
+            { code: 'GOLD5', flatDiscount: 5.00, desc: '$5.00 Instant Cash Off', minSpend: 25 },
+            { code: 'BOGO', flatDiscount: 4.00, desc: 'BOGO $4 Bonus Discount', minSpend: 20 }
+        ];
+
+        // Sample Basket State for Comparison Engine
+        let comparisonCart = [
+            { id: 'c1', name: 'Artisan Burger & Fries', price: 14.50, qty: 1 },
+            { id: 'c2', name: 'Craft Honey Lemonade', price: 4.50, qty: 2 },
+            { id: 'c3', name: 'Ochre Garlic Dip', price: 2.00, qty: 1 }
+        ];
+
+        // Application State
+        let activeCart = [];
+        let activeVoucher = null;
+        let showOpenOnly = true;
+        let activeCuisine = 'All';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderVouchers();
+            renderCuisineFilters();
+            renderRestaurants();
+            updateComparisonEngine();
+        });
+
+        
+        function renderCuisineFilters() {
+            const container = document.getElementById('cuisineFilterContainer');
+            const cuisines = ['All', 'Burger', 'Pizza', 'Asian', 'Healthy', 'Italian', 'Dessert'];
+            
+            container.innerHTML = cuisines.map(c => `
+                <button onclick="selectCuisine('${c}')" class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                    activeCuisine === c 
+                    ? 'bg-ochre-primary text-white shadow-ochre-glow' 
+                    : 'bg-cream-surface text-earth-charcoal hover:bg-cream-dark border border-cream-border'
+                }">
+                    ${c}
+                </button>
+            `).join('');
+        }
+
+        function selectCuisine(cuisine) {
+            activeCuisine = cuisine;
+            renderCuisineFilters();
+            renderRestaurants();
+        }
+
+        function toggleOpenFilter(checked) {
+            showOpenOnly = checked;
+            renderRestaurants();
+            showToast(checked ? 'Filtering for OPEN restaurants only' : 'Showing all restaurants including closed spots');
+        }
+
+        function filterRestaurants() {
+            renderRestaurants();
+        }
+
+        function syncMobileSearch(val) {
+            document.getElementById('globalSearchInput').value = val;
+            renderRestaurants();
+        }
+
+        function renderRestaurants() {
+            const grid = document.getElementById('restaurantGrid');
+            const searchVal = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+
+            const filtered = RESTAURANTS.filter(r => {
+                const matchesOpen = showOpenOnly ? r.isOpen : true;
+                const matchesCuisine = activeCuisine === 'All' || r.cuisine === activeCuisine;
+                const matchesSearch = r.name.toLowerCase().includes(searchVal) || r.popularDish.toLowerCase().includes(searchVal) || r.cuisine.toLowerCase().includes(searchVal);
+                return matchesOpen && matchesCuisine && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center bg-cream-surface rounded-2xl border border-cream-border p-6">
+                        <i class="fa-solid fa-utensils text-4xl text-earth-muted mb-3"></i>
+                        <h3 class="text-base font-bold text-earth-charcoal">No spots match your filter criteria</h3>
+                        <p class="text-xs text-earth-muted mt-1">Try turning off "Open Restaurants Only" or searching for a different item.</p>
+                        <button onclick="resetFilters()" class="mt-4 px-4 py-2 text-xs font-bold bg-ochre-primary text-white rounded-xl">Reset Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(r => `
+                <div class="bg-cream-surface rounded-2xl border border-cream-border overflow-hidden shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group ${!r.isOpen ? 'opacity-90' : ''}">
+                    <div>
+                        <!-- Card Banner Image -->
+                        <div class="relative h-44 overflow-hidden bg-cream-dark">
+                            <img src="${r.img}" alt="${r.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${!r.isOpen ? 'grayscale contrast-75' : ''}">
+                            <div class="absolute inset-0 bg-gradient-to-t from-earth-charcoal/70 via-transparent to-transparent"></div>
+                            
+                            <!-- Real-time Status Badge -->
+                            <div class="absolute top-3 left-3">
+                                ${r.isOpen ? `
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cream-surface/90 backdrop-blur-md text-emerald-700 text-xs font-extrabold shadow-sm border border-emerald-500/20">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-indicator"></span>
+                                        Open • ${r.prepTime}
+                                    </span>
+                                ` : `
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-earth-charcoal/80 backdrop-blur-md text-amber-200 text-xs font-bold border border-amber-300/30">
+                                        <i class="fa-solid fa-moon text-xs"></i>
+                                        Closed • Opens ${r.nextOpen}
+                                    </span>
+                                `}
+                            </div>
+
+                            <!-- Offer Badge -->
+                            <div class="absolute top-3 right-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-ochre-primary text-white text-[10px] font-extrabold uppercase tracking-wide shadow-md">
+                                    ${r.offer}
+                                </span>
+                            </div>
+
+                            <!-- Rating & Distance Bottom Floating -->
+                            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-bold">
+                                <span class="flex items-center gap-1 bg-earth-charcoal/60 px-2.5 py-1 rounded-md backdrop-blur-md">
+                                    <i class="fa-solid fa-star text-yellow-400"></i> ${r.rating} (${r.reviews})
+                                </span>
+                                <span class="bg-earth-charcoal/60 px-2.5 py-1 rounded-md backdrop-blur-md">
+                                    <i class="fa-solid fa-location-dot text-ochre-accent"></i> ${r.dist}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="p-4 space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-extrabold text-earth-charcoal text-base leading-snug group-hover:text-ochre-dark transition-colors">${r.name}</h3>
+                                <span class="text-xs font-bold text-earth-muted bg-cream-dark px-2 py-0.5 rounded-md">${r.cuisine}</span>
+                            </div>
+
+                            <div class="bg-cream-base p-2.5 rounded-xl border border-cream-border flex items-center justify-between text-xs">
+                                <div>
+                                    <span class="block text-[10px] uppercase font-bold text-earth-muted">Popular Dish</span>
+                                    <span class="font-bold text-earth-charcoal">${r.popularDish}</span>
+                                </div>
+                                <span class="font-black text-ochre-dark">$${r.dishPrice.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Actions -->
+                    <div class="p-4 pt-0">
+                        ${r.isOpen ? `
+                            <button onclick="addToCart('${r.id}', '${r.popularDish.replace(/'/g, "\\'")}', ${r.dishPrice}, '${r.img}')" class="w-full py-2.5 rounded-xl bg-ochre-primary hover:bg-ochre-dark text-white text-xs font-extrabold shadow-ochre-glow transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-plus text-xs"></i> Add Popular Item To Cart
+                            </button>
+                        ` : `
+                            <button onclick="openReminderModal('${r.name.replace(/'/g, "\\'")}', '${r.nextOpen}')" class="w-full py-2.5 rounded-xl bg-cream-dark hover:bg-ochre-light text-earth-charcoal text-xs font-bold border border-cream-border transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-bell text-ochre-primary"></i> Pre-Order or Set Alert
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetFilters() {
+            showOpenOnly = false;
+            document.getElementById('openOnlyToggle').checked = false;
+            activeCuisine = 'All';
+            document.getElementById('globalSearchInput').value = '';
+            renderCuisineFilters();
+            renderRestaurants();
+        }
+
+        
+        function renderVouchers() {
+            const container = document.getElementById('voucherContainer');
+            container.innerHTML = VOUCHERS.map(v => {
+                const isApplied = activeVoucher && activeVoucher.code === v.code;
+                return `
+                    <div onclick="selectVoucher('${v.code}')" class="cursor-pointer flex-shrink-0 p-3 rounded-xl border transition-all duration-200 ${
+                        isApplied 
+                        ? 'bg-ochre-primary text-white border-ochre-dark shadow-ochre-glow scale-105' 
+                        : 'bg-cream-base border-cream-border text-earth-charcoal hover:border-ochre-accent hover:bg-ochre-light/20'
+                    }">
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="font-black text-xs uppercase tracking-wider ${isApplied ? 'text-white' : 'text-ochre-dark'}">${v.code}</span>
+                            <i class="fa-solid ${isApplied ? 'fa-circle-check text-white' : 'fa-tag text-ochre-accent'} text-xs"></i>
+                        </div>
+                        <div class="text-[11px] font-bold mt-1 ${isApplied ? 'text-white/90' : 'text-earth-muted'}">${v.desc}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectVoucher(code) {
+            const found = VOUCHERS.find(v => v.code === code);
+            if (found) {
+                activeVoucher = found;
+                renderVouchers();
+                updateVoucherBar();
+                updateComparisonEngine();
+                updateCartDrawer();
+                showToast(`Applied Voucher Code: ${found.code}`);
+            }
+        }
+
+        function applyManualPromo() {
+            const val = document.getElementById('promoInput').value.trim().toUpperCase();
+            if (!val) return;
+            const found = VOUCHERS.find(v => v.code === val);
+            if (found) {
+                selectVoucher(val);
+                document.getElementById('promoInput').value = '';
+            } else {
+                showToast('Invalid promo code. Try QUICK20 or GOLD5.');
+            }
+        }
+
+        function removeVoucher() {
+            activeVoucher = null;
+            renderVouchers();
+            updateVoucherBar();
+            updateComparisonEngine();
+            updateCartDrawer();
+            showToast('Promo code removed.');
+        }
+
+        function updateVoucherBar() {
+            const textEl = document.getElementById('activeVoucherText');
+            const removeBtn = document.getElementById('removeVoucherBtn');
+            const bar = document.getElementById('activeVoucherBar');
+
+            if (activeVoucher) {
+                textEl.innerHTML = `<strong class="text-ochre-dark font-extrabold">${activeVoucher.code}</strong> applied! ${activeVoucher.desc}`;
+                removeBtn.classList.remove('hidden');
+                bar.classList.add('bg-ochre-light', 'border-ochre-accent');
+            } else {
+                textEl.innerText = 'No voucher applied. Click any chip above to save extra!';
+                removeBtn.classList.add('hidden');
+                bar.classList.remove('bg-ochre-light', 'border-ochre-accent');
+            }
+        }
+
+
+        function renderSampleItemsContainer() {
+            const container = document.getElementById('sampleItemsContainer');
+            container.innerHTML = comparisonCart.map((item, idx) => `
+                <div class="bg-cream-surface p-2.5 rounded-xl border border-cream-border flex items-center justify-between text-xs">
+                    <div>
+                        <div class="font-bold text-earth-charcoal">${item.name}</div>
+                        <div class="text-[11px] text-earth-muted">$${item.price.toFixed(2)} each</div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-cream-base px-2 py-1 rounded-lg border border-cream-border">
+                        <button onclick="adjustComparisonQty(${idx}, -1)" class="text-earth-muted hover:text-earth-charcoal font-bold px-1">-</button>
+                        <span class="font-bold text-earth-charcoal">${item.qty}</span>
+                        <button onclick="adjustComparisonQty(${idx}, 1)" class="text-earth-muted hover:text-earth-charcoal font-bold px-1">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function adjustComparisonQty(idx, change) {
+            comparisonCart[idx].qty += change;
+            if (comparisonCart[idx].qty < 1) comparisonCart[idx].qty = 1;
+            updateComparisonEngine();
+        }
+
+        function resetComparisonCart() {
+            comparisonCart = [
+                { id: 'c1', name: 'Artisan Burger & Fries', price: 14.50, qty: 1 },
+                { id: 'c2', name: 'Craft Honey Lemonade', price: 4.50, qty: 2 },
+                { id: 'c3', name: 'Ochre Garlic Dip', price: 2.00, qty: 1 }
+            ];
+            updateComparisonEngine();
+        }
+
+        function updateComparisonEngine() {
+            renderSampleItemsContainer();
+
+            // Calculate Base Total
+            const baseFoodTotal = comparisonCart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
+
+            // Compute platforms
+            const platforms = [
+                {
+                    key: 'quickbites',
+                    name: 'QuickBites',
+                    isBest: true,
+                    menuMarkup: 0.0, // 0% markup
+                    deliveryFee: activeVoucher && activeVoucher.code === 'FREEDEL' ? 0.00 : 1.99,
+                    serviceFee: 0.99,
+                    surgeFee: 0.00,
+                    badge: 'BEST VALUE'
+                },
+                {
+                    key: 'ubereats',
+                    name: 'UberEats',
+                    isBest: false,
+                    menuMarkup: 0.15, // 15% hidden menu inflation
+                    deliveryFee: 3.99,
+                    serviceFee: 2.80,
+                    surgeFee: 1.50,
+                    badge: 'SURGE ACTIVE'
+                },
+                {
+                    key: 'doordash',
+                    name: 'DoorDash',
+                    isBest: false,
+                    menuMarkup: 0.12,
+                    deliveryFee: 3.49,
+                    serviceFee: 2.50,
+                    surgeFee: 0.00,
+                    badge: 'STANDARD'
+                },
+                {
+                    key: 'deliveroo',
+                    name: 'Deliveroo',
+                    isBest: false,
+                    menuMarkup: 0.18,
+                    deliveryFee: 4.29,
+                    serviceFee: 2.99,
+                    surgeFee: 1.00,
+                    badge: 'HIGH FEES'
+                }
+            ];
+
+            let qbFinalTotal = 0;
+            let highestCompetitorTotal = 0;
+
+            const grid = document.getElementById('platformComparisonGrid');
+            grid.innerHTML = '';
+
+            platforms.forEach(p => {
+                const foodCost = baseFoodTotal * (1 + p.menuMarkup);
+                let discount = 0;
+
+                if (p.key === 'quickbites' && activeVoucher) {
+                    if (activeVoucher.discountPercent) {
+                        discount = (foodCost * activeVoucher.discountPercent) / 100;
+                    } else if (activeVoucher.flatDiscount) {
+                        discount = activeVoucher.flatDiscount;
+                    }
+                }
+
+                const total = Math.max(0, (foodCost + p.deliveryFee + p.serviceFee + p.surgeFee) - discount);
+
+                if (p.key === 'quickbites') qbFinalTotal = total;
+                if (total > highestCompetitorTotal) highestCompetitorTotal = total;
+
+                // Render platform card
+                grid.innerHTML += `
+                    <div class="rounded-2xl p-4 border transition-all duration-300 flex flex-col justify-between ${
+                        p.isBest 
+                        ? 'bg-cream-surface border-ochre-accent shadow-ochre-glow ring-2 ring-ochre-primary/50 relative overflow-hidden' 
+                        : 'bg-cream-base border-cream-border opacity-80 hover:opacity-100'
+                    }">
+                        ${p.isBest ? `
+                            <div class="absolute top-0 right-0 shimmer-badge text-white font-black text-[9px] px-3 py-0.5 rounded-bl-lg tracking-wider uppercase shadow-sm">
+                                Best Value
+                            </div>
+                        ` : ''}
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-extrabold text-sm ${p.isBest ? 'text-ochre-dark' : 'text-earth-charcoal'}">${p.name}</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${p.isBest ? 'bg-ochre-light text-ochre-dark' : 'bg-cream-dark text-earth-muted'}">${p.badge}</span>
+                            </div>
+
+                            <div class="my-3">
+                                <div class="text-2xl font-black ${p.isBest ? 'text-ochre-dark' : 'text-earth-charcoal'}">$${total.toFixed(2)}</div>
+                                <div class="text-[11px] text-earth-muted font-semibold mt-0.5">
+                                    ${p.isBest ? 'Zero Hidden Menu Markups' : `${(p.menuMarkup * 100).toFixed(0)}% Menu Price Markup`}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-cream-border space-y-1 text-[11px] text-earth-muted">
+                            <div class="flex justify-between">
+                                <span>Menu Subtotal:</span>
+                                <span>$${foodCost.toFixed(2)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Delivery Fee:</span>
+                                <span>$${p.deliveryFee.toFixed(2)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Service & Surge:</span>
+                                <span>$${(p.serviceFee + p.surgeFee).toFixed(2)}</span>
+                            </div>
+                            ${discount > 0 ? `
+                                <div class="flex justify-between text-emerald-600 font-bold">
+                                    <span>Applied Coupon:</span>
+                                    <span>-$${discount.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Update Top Savings Banner
+            const maxSavings = Math.max(0, highestCompetitorTotal - qbFinalTotal);
+            document.getElementById('savingsAmountText').innerText = `Save up to $${maxSavings.toFixed(2)} on this order basket!`;
+            document.getElementById('drawerSavingsText').innerText = `$${maxSavings.toFixed(2)}`;
+
+            // Populate Breakdown Accordion Table
+            populateTableBreakdown(baseFoodTotal, platforms);
+        }
+
+        function populateTableBreakdown(baseFood, platforms) {
+            const tbody = document.getElementById('comparisonTableBody');
+            
+            const rows = [
+                { label: 'Raw Dish Price Total', getValue: p => `$${baseFood.toFixed(2)}` },
+                { label: 'Menu Inflation Markup', getValue: p => p.menuMarkup > 0 ? `+${(p.menuMarkup * 100).toFixed(0)}% ($${(baseFood * p.menuMarkup).toFixed(2)})` : '$0.00 (0%)' },
+                { label: 'Standard Delivery Fee', getValue: p => `$${p.deliveryFee.toFixed(2)}` },
+                { label: 'Platform Service Charge', getValue: p => `$${p.serviceFee.toFixed(2)}` },
+                { label: 'Peak Hour Surge Charge', getValue: p => p.surgeFee > 0 ? `<span class="text-red-600 font-bold">+$${p.surgeFee.toFixed(2)}</span>` : '$0.00' },
+                { label: 'QuickBites Voucher Discount', getValue: p => p.key === 'quickbites' && activeVoucher ? `<span class="text-emerald-600 font-bold">Applied</span>` : 'N/A' }
+            ];
+
+            tbody.innerHTML = rows.map(r => `
+                <tr>
+                    <td class="py-2.5 px-3 font-semibold text-earth-charcoal">${r.label}</td>
+                    ${platforms.map(p => `
+                        <td class="py-2.5 px-3 ${p.isBest ? 'bg-ochre-light/20 font-bold text-ochre-dark' : ''}">
+                            ${r.getValue(p)}
+                        </td>
+                    `).join('')}
+                </tr>
+            `).join('');
+        }
+
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            const chevron = document.getElementById('breakdownChevron');
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                el.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+
+
+        function addToCart(restId, dishName, price, img) {
+            const existing = activeCart.find(i => i.name === dishName);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                activeCart.push({ restId, name: dishName, price, qty: 1, img });
+            }
+            updateCartDrawer();
+            showToast(`Added "${dishName}" to basket!`);
+            toggleCartDrawer(true);
+        }
+
+        function updateCartDrawer() {
+            const countEl = document.getElementById('headerCartCount');
+            const totalEl = document.getElementById('headerCartTotal');
+            const listEl = document.getElementById('cartItemList');
+
+            const totalItems = activeCart.reduce((sum, item) => sum + item.qty, 0);
+            const rawSubtotal = activeCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            let discount = 0;
+            if (activeVoucher && rawSubtotal > 0) {
+                if (activeVoucher.discountPercent) discount = (rawSubtotal * activeVoucher.discountPercent) / 100;
+                else if (activeVoucher.flatDiscount) discount = activeVoucher.flatDiscount;
+            }
+
+            const deliveryFee = rawSubtotal > 0 ? (activeVoucher && activeVoucher.code === 'FREEDEL' ? 0 : 1.99) : 0;
+            const grandTotal = Math.max(0, (rawSubtotal + deliveryFee) - discount);
+            const pointsEarned = Math.floor(grandTotal * 10);
+
+            countEl.innerText = totalItems;
+            totalEl.innerText = `$${grandTotal.toFixed(2)}`;
+
+            document.getElementById('cartSubtotal').innerText = `$${rawSubtotal.toFixed(2)}`;
+            document.getElementById('cartDeliveryFee').innerText = `$${deliveryFee.toFixed(2)}`;
+            document.getElementById('cartDiscount').innerText = `-$${discount.toFixed(2)}`;
+            document.getElementById('cartGrandTotal').innerText = `$${grandTotal.toFixed(2)}`;
+            document.getElementById('cartPointsEarned').innerText = `+${pointsEarned} pts`;
+
+            if (activeCart.length === 0) {
+                listEl.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center p-6 text-earth-muted">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-3 text-cream-dark"></i>
+                        <p class="font-bold text-earth-charcoal text-sm">Your basket is currently empty</p>
+                        <p class="text-xs mt-1">Browse open restaurants to add fresh meals.</p>
+                    </div>
+                `;
+            } else {
+                listEl.innerHTML = activeCart.map((item, idx) => `
+                    <div class="bg-cream-base p-3 rounded-2xl border border-cream-border flex items-center justify-between gap-3">
+                        <img src="${item.img}" class="w-12 h-12 rounded-xl object-cover" alt="${item.name}">
+                        <div class="flex-1">
+                            <h4 class="text-xs font-bold text-earth-charcoal leading-snug">${item.name}</h4>
+                            <span class="text-xs font-black text-ochre-dark">$${item.price.toFixed(2)}</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-cream-surface px-2 py-1 rounded-lg border border-cream-border">
+                            <button onclick="changeCartQty(${idx}, -1)" class="text-earth-muted font-bold text-xs px-1">-</button>
+                            <span class="text-xs font-bold text-earth-charcoal">${item.qty}</span>
+                            <button onclick="changeCartQty(${idx}, 1)" class="text-earth-muted font-bold text-xs px-1">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function changeCartQty(idx, change) {
+            activeCart[idx].qty += change;
+            if (activeCart[idx].qty <= 0) {
+                activeCart.splice(idx, 1);
+            }
+            updateCartDrawer();
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cartDrawer');
+            const backdrop = document.getElementById('cartBackdrop');
+            const panel = document.getElementById('cartPanel');
+
+            if (open) {
+                drawer.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    panel.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                backdrop.classList.add('opacity-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    drawer.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function executeCheckout() {
+            if (activeCart.length === 0) {
+                showToast('Please add items to your basket before checkout.');
+                return;
+            }
+            toggleCartDrawer(false);
+            showToast('🎉 Order placed successfully! Live track assigned driver.');
+            activeCart = [];
+            updateCartDrawer();
+        }
+
+
+        function openReminderModal(name, time) {
+            document.getElementById('modalRestName').innerText = name;
+            document.getElementById('modalRestDetail').innerText = `This location is currently closed. It opens around ${time}. Set a push alert or pre-order.`;
+            document.getElementById('reminderModal').classList.remove('hidden');
+        }
+
+        function closeReminderModal() {
+            document.getElementById('reminderModal').classList.add('hidden');
+        }
+
+        function openRewardsModal() {
+            document.getElementById('rewardsModal').classList.remove('hidden');
+        }
+
+        function closeRewardsModal() {
+            document.getElementById('rewardsModal').classList.add('hidden');
+        }
+
+        function claimPerk(perkName, cost) {
+            closeRewardsModal();
+            showToast(`Redeemed ${perkName} for ${cost} points!`);
+        }
+
+        function confirmAction(msg) {
+            closeReminderModal();
+            showToast(msg);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
