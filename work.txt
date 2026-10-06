@@ -1,0 +1,31 @@
+ARJUN
+Categorization of food
+Multiple payment methods
+Suggestions based on time
+
+JYOTHSNA
+Minimal User friendly UI
+Feedback functionalities
+Control Suggestions
+
+KARTHIK
+Price comparison modules
+Functionalities for offers and discounts and rewards
+Only currently available restaurants
+
+STIFAANY
+Personalization Options
+Proper add to cart functionalities
+Incentives
+
+EDWIN
+Live tracking of delivery
+Order history
+
+RIHAN
+Account management- person details, address
+Filter based on price ratings.
+
+SOUPARNIKA
+Notification module
+Customer Care Services
