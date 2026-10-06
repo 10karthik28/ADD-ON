@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delivery tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef2f6;--card:#fff;--ink:#14213d;--mute:#5d6b82;--line:#d9e0ea;--route:#0f766e;--rider:#f59e0b;--road:#dfe6ef;--ok:#15803d;--bad:#b91c1c;--blk:#e4ebf3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1624;--card:#17223a;--ink:#e8eef9;--mute:#94a3bd;--line:#2a3856;--route:#2dd4bf;--road:#223250;--ok:#4ade80;--bad:#f87171;--blk:#1b2944}}
+:root[data-theme="dark"]{--bg:#0e1624;--card:#17223a;--ink:#e8eef9;--mute:#94a3bd;--line:#2a3856;--route:#2dd4bf;--road:#223250;--ok:#4ade80;--bad:#f87171;--blk:#1b2944}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;font-weight:800;margin:0 0 14px}
+.tabs{display:flex;gap:6px;background:var(--blk);padding:4px;border-radius:12px;margin-bottom:16px}
+.tabs button{flex:1;border:0;background:none;color:var(--mute);font:600 .95rem inherit;font-family:inherit;padding:10px;border-radius:9px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+button:focus-visible{outline:2px solid var(--route);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.eta{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.eta b{font-size:2.6rem;font-weight:800;line-height:1}
+.eta span{color:var(--mute)}
+.map{width:100%;height:auto;display:block;border-radius:12px;background:var(--blk)}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{display:flex;gap:12px;padding:8px 0;color:var(--mute);position:relative}
+.steps li::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--card);margin-top:5px;flex:none;z-index:1}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:6px;top:24px;bottom:-8px;width:2px;background:var(--line)}
+.steps li.done{color:var(--ink)}
+.steps li.done::before{background:var(--route);border-color:var(--route)}
+.steps li.now{color:var(--ink);font-weight:600}
+.steps li.now::before{border-color:var(--rider);background:var(--rider)}
+.steps small{display:block;font-weight:400;color:var(--mute)}
+.rider{display:flex;align-items:center;gap:12px}
+.av{width:44px;height:44px;border-radius:50%;background:var(--route);color:var(--card);display:grid;place-items:center;font-weight:800}
+.pill{font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--blk)}
+.pill.ok{color:var(--ok)}.pill.bad{color:var(--bad)}
+.filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filters button{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:.9rem;padding:6px 14px;border-radius:99px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.order{width:100%;text-align:left;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;display:block}
+.order:focus-visible{outline:2px solid var(--route)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.row strong{font-weight:600}
+.meta{color:var(--mute);font-size:.9rem}
+.detail{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:none}
+.order[aria-expanded="true"] .detail{display:block}
+.detail .row{padding:2px 0}
+.act{margin-top:10px;border:0;background:var(--route);color:var(--bg);font:600 .9rem inherit;font-family:inherit;padding:8px 14px;border-radius:9px;cursor:pointer}
+.empty{text-align:center;color:var(--mute);padding:28px 0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Your deliveries</h1>
+<div class="tabs" role="tablist">
+  <button role="tab" id="t-track" aria-selected="true">Live tracking</button>
+  <button role="tab" id="t-hist" aria-selected="false">Order history</button>
+</div>
+
+<section id="track">
+  <div class="card eta">
+    <div><span id="status">Preparing your order</span><br><b id="eta">--</b> <span>min away</span></div>
+    <div class="meta" style="text-align:right">Order #4821<br><span id="dist">--</span> left</div>
+  </div>
+  <div class="card" style="padding:10px">
+    <svg class="map" viewBox="0 0 400 260" role="img" aria-label="Map showing the courier moving along the route to your address">
+      <g stroke="var(--road)" stroke-width="10" fill="none">
+        <path d="M0 60H400M0 130H400M0 200H400M70 0V260M170 0V260M270 0V260M350 0V260"/>
+      </g>
+      <path id="route" d="M40 220 L70 200 L70 130 L170 130 L170 60 L270 60 L270 130 L350 130 L350 80" fill="none" stroke="var(--line)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="trail" d="M40 220 L70 200 L70 130 L170 130 L170 60 L270 60 L270 130 L350 130 L350 80" fill="none" stroke="var(--route)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="28" y="208" width="24" height="24" rx="6" fill="var(--ink)"/>
+      <text x="40" y="225" text-anchor="middle" font-size="12" fill="var(--bg)">K</text>
+      <circle cx="350" cy="80" r="11" fill="var(--route)"/>
+      <circle cx="350" cy="80" r="4" fill="var(--card)"/>
+      <g id="rider"><circle r="14" fill="var(--rider)" opacity=".3"/><circle r="8" fill="var(--rider)" stroke="var(--card)" stroke-width="2"/></g>
+    </svg>
+    <div class="meta" style="padding:8px 4px 0">Kitchen (K) to your door. Updates every second in this demo.</div>
+  </div>
+  <div class="card rider">
+    <div class="av">RK</div>
+    <div style="flex:1"><strong>Ravi Kumar</strong><div class="meta">Your courier, 4.9 rating</div></div>
+    <button class="act" style="margin:0" id="call">Call</button>
+  </div>
+  <div class="card"><ul class="steps" id="steps"></ul></div>
+  <button class="act" id="restart" style="margin-top:0">Replay delivery</button>
+</section>
+
+<section id="hist" hidden>
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+/* ---- Live tracking ---- */
+const route=$('#route'),trail=$('#trail'),rider=$('#rider');
+const L=route.getTotalLength();
+trail.style.strokeDasharray=L;
+const TOTAL=90; // demo seconds for the whole trip
+let t=0, timer;
+const STEPS=[
+ ['Order confirmed','Kitchen accepted your order',0],
+ ['Being prepared','Packing everything fresh',.08],
+ ['Picked up','Ravi left the kitchen',.18],
+ ['On the way','Heading to your address',.3],
+ ['Arriving','Almost at your door',.9],
+ ['Delivered','Enjoy your meal',1]
+];
+function render(){
+  const p=Math.min(t/TOTAL,1);
+  const moveP=Math.max(0,(p-.18)/.82);
+  const pt=route.getPointAtLength(L*moveP);
+  rider.setAttribute('transform',`translate(${pt.x} ${pt.y})`);
+  trail.style.strokeDashoffset=L*(1-moveP);
+  let idx=0;STEPS.forEach((s,i)=>{if(p>=s[2])idx=i});
+  if(p>=1)idx=5;
+  $('#status').textContent=STEPS[idx][0];
+  const mins=Math.max(0,Math.ceil((1-p)*18));
+  $('#eta').textContent=p>=1?'0':mins;
+  $('#dist').textContent=(Math.max(0,(1-moveP)*3.2)).toFixed(1)+' km';
+  $('#steps').innerHTML=STEPS.map((s,i)=>`<li class="${i<idx||p>=1?'done':i===idx?'now':''}"><div>${s[0]}<small>${s[1]}</small></div></li>`).join('');
+}
+function start(){clearInterval(timer);t=0;render();timer=setInterval(()=>{t++;render();if(t>=TOTAL)clearInterval(timer)},1000)}
+$('#restart').onclick=start;
+$('#call').onclick=()=>alert('Calling Ravi Kumar (demo only).');
+start();
+
+/* ---- Order history ---- */
+const ORDERS=[
+ {id:4821,shop:'Saravana Kitchen',date:'6 Oct 2026',total:486,status:'Active',items:['Chicken biryani x2','Raita','Gulab jamun x2']},
+ {id:4790,shop:'Fresh Basket Grocers',date:'2 Oct 2026',total:1240,status:'Delivered',items:['Rice 5 kg','Toor dal 1 kg','Milk x4','Eggs x12']},
+ {id:4733,shop:'Dosa Corner',date:'28 Sep 2026',total:312,status:'Delivered',items:['Masala dosa x2','Filter coffee x2']},
+ {id:4702,shop:'MedPlus Pharmacy',date:'24 Sep 2026',total:640,status:'Cancelled',items:['Vitamin D3','Cough syrup']},
+ {id:4650,shop:'Pizza Haven',date:'19 Sep 2026',total:899,status:'Delivered',items:['Margherita large','Garlic bread','Cola x2']},
+ {id:4611,shop:'Saravana Kitchen',date:'12 Sep 2026',total:528,status:'Delivered',items:['Veg meals x3','Payasam']}
+];
+let filter='All';
+const FILTERS=['All','Active','Delivered','Cancelled'];
+function renderHist(){
+  $('#filters').innerHTML=FILTERS.map(f=>`<button aria-pressed="${f===filter}" data-f="${f}">${f}</button>`).join('');
+  const rows=ORDERS.filter(o=>filter==='All'||o.status===filter);
+  $('#list').innerHTML=rows.length?rows.map(o=>`
+  <button class="order" aria-expanded="false" data-id="${o.id}">
+    <div class="row"><strong>${o.shop}</strong><span class="pill ${o.status==='Delivered'?'ok':o.status==='Cancelled'?'bad':''}">${o.status}</span></div>
+    <div class="row meta"><span>#${o.id}, ${o.date}</span><span>Rs ${o.total.toLocaleString('en-IN')}</span></div>
+    <div class="detail">${o.items.map(i=>`<div class="row"><span>${i}</span></div>`).join('')}
+      <span class="act" role="button" data-act="${o.status==='Active'?'track':'again'}" tabindex="0" style="display:inline-block">${o.status==='Active'?'Track order':'Order again'}</span>
+    </div>
+  </button>`).join(''):'<div class="empty">No orders in this view yet.</div>';
+}
+$('#filters').onclick=e=>{const b=e.target.closest('button');if(b){filter=b.dataset.f;renderHist()}};
+$('#list').onclick=e=>{
+  const a=e.target.closest('[data-act]');
+  if(a){e.stopPropagation();if(a.dataset.act==='track')show('track');else alert('Added to cart (demo only).');return}
+  const o=e.target.closest('.order');
+  if(o)o.setAttribute('aria-expanded',o.getAttribute('aria-expanded')!=='true');
+};
+
+/* ---- Tabs ---- */
+function show(w){
+  $('#track').hidden=w!=='track';$('#hist').hidden=w!=='hist';
+  $('#t-track').setAttribute('aria-selected',w==='track');
+  $('#t-hist').setAttribute('aria-selected',w==='hist');
+}
+$('#t-track').onclick=()=>show('track');
+$('#t-hist').onclick=()=>show('hist');
+renderHist();
+</script>
+</body>
+</html>
