@@ -1,0 +1,39 @@
+name: Continuous Integration
+
+# 1. Define what events trigger this workflow
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows you to trigger the workflow manually from the GitHub UI
+
+# 2. Define the execution blocks
+jobs:
+  build-and-test:
+    name: Build and Test Application
+    runs-on: ubuntu-latest # The type of virtual machine runner to use
+
+    steps:
+      # Step 1: Check out the repository's source code onto the runner
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up the specific Node.js runtime environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm' # Automatically caches dependencies for faster subsequent runs
+
+      # Step 3: Install dependencies cleanly without modifying the lockfile
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Compile/build the project (if applicable)
+      - name: Build project
+        run: npm run build --if-present
+
+      # Step 5: Execute the automated test suite
+      - name: Run automated tests
+        run: npm test
